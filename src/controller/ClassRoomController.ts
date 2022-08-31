@@ -43,6 +43,7 @@ export default class ClassRoomController {
     public async create(req: Request, res:Response, {title, description, course, fileStorage}: IclassRoom) {
         try {
             const {title, description, course, fileStorage} = req.body;
+             const imgName = req.file?.filename;
             const repository = AppDataSource.getRepository(ClassRoom);
 
                 let existclassRoom =  await repository.findOneBy({title});
@@ -54,8 +55,8 @@ export default class ClassRoomController {
             classRoom.title = title;
             classRoom.description = description;
             classRoom.course = course;
-            if (fileStorage != null) {
-                classRoom.fileStorage = fileStorage;
+            if (imgName != null) {
+                classRoom.fileStorage = imgName;
             }
             
             const data = await repository.save(classRoom);
@@ -69,6 +70,7 @@ export default class ClassRoomController {
         try {
             const id = req.params.id;
             const {title, description, course, fileStorage} = req.body;
+            const imgName = req.file?.filename;
             const repository = AppDataSource.getRepository(ClassRoom);
 
             const existClass = await repository.createQueryBuilder("classroom")
@@ -84,11 +86,23 @@ export default class ClassRoomController {
                                         .where("classroom.id = :id", {id})
                                         .getOne();
             
-            classRoom!.title = title;
-            classRoom!.description = description;
-            classRoom!.course = course;
-            if (fileStorage != undefined) {
-                classRoom!.fileStorage = fileStorage;
+            
+            if(title) {
+                classRoom!.title = title;
+            }  
+            
+            if(description) {
+                classRoom!.description = description;
+            }
+            
+            if (course && course.length > 0) {
+                classRoom!.course = course;
+            }
+            
+            
+            
+            if (imgName != undefined) {
+                classRoom!.fileStorage = imgName;
             }
         
             const data = await repository.save(classRoom!);

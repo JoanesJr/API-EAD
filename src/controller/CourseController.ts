@@ -5,7 +5,7 @@ import {Request, Response} from 'express'
 interface ICourse {
     name: string,
     description: string,
-    filename?: string
+    filename: string
 }
 
 export default class CourseController {
@@ -35,6 +35,7 @@ export default class CourseController {
         try {
             const {name, description, filename} = req.body;
             const courseRepository = AppDataSource.getRepository(Course);
+            const imgName = req.file?.filename;
 
             const existCourse = await courseRepository.findOneBy({name});
             if (existCourse != null) {
@@ -44,7 +45,7 @@ export default class CourseController {
             const course = new Course();
             course.name = name;
             course.description = description;
-            course.filename = filename;
+            course.filename = imgName;
             
             const data = await courseRepository.save(course);
             res.status(200).send(data);
@@ -102,5 +103,10 @@ export default class CourseController {
         }catch(e:any) {
             res.status(500).json({error: e.message});
         }      
+    }
+
+    public async teste(req: Request, res:Response) {
+        console.log(req.file)
+        res.status(200).send('deu bom meu parceiro.')
     }
 }
